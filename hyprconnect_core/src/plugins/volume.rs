@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct SystemVolume {
+pub struct SystemVolume {
     #[serde(rename = "sinkList")]
     pub sink_list: Option<Vec<Stream>>,
     pub name: Option<String>,
@@ -13,7 +13,7 @@ struct SystemVolume {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct Stream {
+pub struct Stream {
     pub name: String,
     pub description: String,
     pub enabled: Option<bool>,
@@ -27,7 +27,7 @@ struct Stream {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct SystemVolumeRequest {
+pub struct SystemVolumeRequest {
     #[serde(rename = "requestSinks")]
     pub request_sinks: Option<bool>,
     pub name: Option<String>,

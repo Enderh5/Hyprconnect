@@ -25,7 +25,7 @@ pub struct Battery {
     since = "1.0.0",
     note = "This packet body is deprecated and should be empty"
 )]
-pub struct BatteryRequestBody {
+pub struct BatteryRequest {
     /// ⚠️ Deprecated: Field no longer used. If present, it's ignored.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]

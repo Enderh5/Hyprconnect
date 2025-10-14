@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TelephonyBody {
+pub struct Telephony {
     pub event: TelephonyEvent,
 
     pub contact_name: Option<String>,
@@ -26,3 +26,7 @@ pub enum TelephonyEvent {
     #[serde(rename = "sms")]
     Sms,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TelephonyRequestMute;

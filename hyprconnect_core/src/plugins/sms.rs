@@ -2,7 +2,13 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct SmsMessages {
+pub struct SmsAttachmentFile {
+    pub file: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SmsMessages {
     pub messages: Vec<Message>,
     pub version: Option<u8>,
 }

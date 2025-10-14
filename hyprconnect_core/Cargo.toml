@@ -10,4 +10,7 @@ uuid = { version = "1.7", features = ["v4"] }
 tokio = { version = "1.43", features = ["full"] }
 anyhow = "1.0"
 thiserror = "1.0"
+async-trait = "0.1.89"
+libc = "0.2.177"
+dirs = "6.0.0"
 

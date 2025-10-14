@@ -1,3 +1,4 @@
+pub mod device;
 pub mod plugins;
 pub mod protocol;
 pub mod transport;

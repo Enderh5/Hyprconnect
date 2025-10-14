@@ -1,4 +1,3 @@
 fn main() {
-    println!("Hello, world!");
+    let udp_broadcast: Broadcast;
 }
-
