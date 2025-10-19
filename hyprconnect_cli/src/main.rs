@@ -14,7 +14,7 @@ async fn main() {
 
     match cmd {
         Command::Ping { device_id } => {
-            ping(&device_id).await;
+            let _ = ping(&device_id).await;
         }
     }
 }

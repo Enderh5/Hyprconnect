@@ -67,5 +67,4 @@ pub fn load_device_name() -> String {
     get_hostname()
         .unwrap_or_else(|_| "Hyprconnect".into())
         .to_string()
-        .into()
 }

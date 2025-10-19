@@ -6,7 +6,7 @@ use serde::Serialize;
 use std::net::SocketAddr;
 
 use crate::protocol::Packet;
-use crate::transport::udp::UdpBroadcast;
+use crate::transport::udp::LanBroadcast;
 
 ///Este trait deberá ser implementado por los distintos objetos que se encargen de enviar y recibir
 ///paquetes al dispositivo,
@@ -27,7 +27,7 @@ pub enum TransportKind {}
 
 #[async_trait]
 impl Transport for TransportKind {
-    async fn send<T: Serialize + Send + Sync>(&self, packet: &Packet) -> Result<()> {
+    async fn send<T: Serialize + Send + Sync>(&self, _packet: &Packet) -> Result<()> {
         match self {
             _ => todo!(),
         }
@@ -55,12 +55,13 @@ pub struct DiscoveredDevice {
 
 pub trait Broadcast {
     fn broadcast_probe(&self) -> Result<()>;
-    fn listen_for_responses(&self) -> Result<Vec<DiscoveredDevice>>;
+    /// Escuchar a broadcasts de otros clientes, la duración está en milisegundos
+    fn listen_for_responses(&self, duration: u64) -> Result<Vec<Packet>>;
 }
 
 ///Enum Wrapper para permitir seleccionar el tipo de transporte en tiempo de ejecución.
 pub enum BroadcastKind {
-    UdpBroadcast(UdpBroadcast),
+    UdpBroadcast(LanBroadcast),
 }
 
 #[async_trait]
@@ -70,9 +71,11 @@ impl Broadcast for BroadcastKind {
             BroadcastKind::UdpBroadcast(udp_broadcast) => udp_broadcast.broadcast_probe(),
         }
     }
-    fn listen_for_responses(&self) -> Result<Vec<DiscoveredDevice>> {
+    fn listen_for_responses(&self, duration: u64) -> Result<Vec<Packet>> {
         match self {
-            BroadcastKind::UdpBroadcast(udp_broadcast) => udp_broadcast.listen_for_responses(),
+            BroadcastKind::UdpBroadcast(udp_broadcast) => {
+                udp_broadcast.listen_for_responses(duration)
+            }
         }
     }
 }

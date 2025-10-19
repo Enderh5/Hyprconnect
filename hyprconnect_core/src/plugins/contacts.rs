@@ -29,7 +29,7 @@ impl ContactsResponseUidsTimestamps {
         for uid in &self.uids {
             match self.extras.get(uid) {
                 Some(v) => {
-                    map.insert(uid.clone(), v.clone());
+                    map.insert(uid.clone(), *v);
                 }
                 None => return Err(anyhow!("timestamp faltante para uid '{}'", uid)),
             }

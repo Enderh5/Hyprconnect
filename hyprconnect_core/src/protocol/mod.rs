@@ -35,7 +35,7 @@ use crate::{
     },
 };
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Packet {
     pub id: u128,
@@ -43,12 +43,13 @@ pub struct Packet {
     pub packet_type: String,
     pub body: PacketBody,
     #[serde(rename = "payloadSize")]
-    pub payload_size: f64,
+    pub payload_size: Option<usize>,
     #[serde(default)]
     pub payload_transfer_info: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum PacketBody {
     Identity(Identity),
     Pair(Pair),
@@ -105,7 +106,7 @@ impl Packet {
             PacketBody::Battery(_) => "kdeconnect.battery",
             PacketBody::BatteryRequest(_) => "kdeconnect.battery.request",
             PacketBody::Clipboard(_) => "kdeconnect.clipboard",
-            PacketBody::ClipboardConnect(_) => "kdeconnect.clipboard",
+            PacketBody::ClipboardConnect(_) => "kdeconnect.clipboard.connect",
             PacketBody::ConectivityReport(_) => "kdeconnect.conectivity_report",
             PacketBody::ConectivityReportRequest(_) => "kdeconnect.conectivity_report.request",
             PacketBody::ContactsRequestAllUuidTimestamps(_) => {
@@ -156,16 +157,188 @@ impl Packet {
             .duration_since(UNIX_EPOCH)
             .expect("time should go forward");
 
-        let payload_size = serde_json::to_vec(&body)
-            .map(|v| v.len() as f64)
-            .unwrap_or(0.0);
+        let payload_size = serde_json::to_vec(&body).map(|v| v.len()).unwrap_or(0);
 
         Ok(Self {
             id: current_time.as_millis(),
             packet_type,
             body,
-            payload_size,
+            payload_size: Some(payload_size),
             payload_transfer_info,
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct RawPacket {
+    pub id: u128,
+    #[serde(rename = "type")]
+    pub packet_type: String,
+    pub body: serde_json::Value, // body genérico
+    #[serde(rename = "payloadSize")]
+    pub payload_size: Option<usize>,
+    #[serde(default)]
+    pub payload_transfer_info: Option<serde_json::Value>,
+}
+
+impl<'de> Deserialize<'de> for Packet {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let raw = RawPacket::deserialize(deserializer)?;
+
+        // Ahora decidimos qué tipo concreto usar según packet_type
+        let body = match raw.packet_type.as_str() {
+            "kdeconnect.identity" => PacketBody::Identity(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.pair" => PacketBody::Pair(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+
+            "kdeconnect.battery" => PacketBody::Battery(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.battery.request" => PacketBody::BatteryRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.clipboard" => PacketBody::Clipboard(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.clipboard.connect" => PacketBody::ClipboardConnect(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.conectivity_report" => PacketBody::ConectivityReport(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.conectivity_report.request" => PacketBody::ConectivityReportRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.contacts.request_all_uids_timestamps" => {
+                PacketBody::ContactsRequestAllUuidTimestamps(
+                    serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+                )
+            }
+            "kdeconnect.contacts.request_vcards_by_uid" => PacketBody::ContactsRequestVcardsByUuid(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.contacts.response_all_uids_vcards" => PacketBody::ContactsResponseVcards(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.contacts.response_all_uids_timestamps" => {
+                PacketBody::ContactsResponseUidsTimestamps(
+                    serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+                )
+            }
+            "kdeconnect.findmyphone.request" => PacketBody::FindMyPhoneRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.lock" => PacketBody::Lock(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.lock.request" => PacketBody::LockRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.mousepad.echo" => PacketBody::MousepadEcho(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.mousepad.keyboardstate" => PacketBody::MousepadKeyboardState(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.mousepad.request" => PacketBody::MousepadRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.mpris" => PacketBody::Mpris(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.mpris.request" => PacketBody::MprisRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.notification" => PacketBody::Notification(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.notification.action" => PacketBody::NotificationAction(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.notification.reply" => PacketBody::NotificationReply(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.notification.request" => PacketBody::NotificationRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.notification.request" => PacketBody::NotificationRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.ping" => PacketBody::Ping(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.presenter" => PacketBody::Presenter(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.runcommand" => PacketBody::RunCommand(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.runcommand.request" => PacketBody::RunCommandRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.sftp" => PacketBody::Sftp(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.sftp.request" => PacketBody::SftpRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.share.request" => PacketBody::ShareRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.share.request.update" => PacketBody::ShareRequestUpdate(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.sms.attachment_file" => PacketBody::SmsAttachmentFile(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.sms.messages" => PacketBody::SmsMessages(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.sms.request" => PacketBody::SmsRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.sms.request_attachment" => PacketBody::SmsRequestAttachment(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.sms.request_conversation" => PacketBody::SmsRequestConversation(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.sms.request_conversations" => PacketBody::SmsRequestConversations(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.systemvolume" => PacketBody::SystemVolume(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.systemvolume.request" => PacketBody::SystemVolumeRequest(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.telephony" => PacketBody::Telephony(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            "kdeconnect.telephony.request_mute" => PacketBody::TelephonyRequestMute(
+                serde_json::from_value(raw.body).map_err(serde::de::Error::custom)?,
+            ),
+            other => {
+                return Err(serde::de::Error::custom(format!(
+                    "Tipo de paquete desconocido: {}",
+                    other
+                )));
+            }
+        };
+
+        Ok(Packet {
+            id: raw.id,
+            packet_type: raw.packet_type,
+            body,
+            payload_size: raw.payload_size,
+            payload_transfer_info: raw.payload_transfer_info,
         })
     }
 }
@@ -180,7 +353,7 @@ pub struct Identity {
     pub device_name: String,
 
     /// "phone" o "desktop"
-    #[serde(rename = "device_type")]
+    #[serde(rename = "deviceType")]
     pub device_type: String,
 
     #[serde(rename = "incomingCapabilities")]
@@ -203,9 +376,9 @@ impl Identity {
             device_id: load_or_generate_device_id(),
             device_name: load_device_name(),
             device_type: "desktop".to_string(),
-            incoming_capabilities: vec![],
-            outgoing_capabilities: vec![],
-            protocol_version: 7,
+            incoming_capabilities: vec!["kdeconnect.ping".to_string()],
+            outgoing_capabilities: vec!["kdeconnect.ping".to_string()],
+            protocol_version: 8,
             extras,
         })
     }

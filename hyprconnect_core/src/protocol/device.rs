@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Error};
 use serde::{Deserialize, Serialize};
 
-use crate::protocol::{Identity, Packet, PacketBody};
+use crate::protocol::{Packet, PacketBody};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Device {
