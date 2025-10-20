@@ -1,8 +1,0 @@
-io/github/rodrigoafernandez/App.class
-io/github/rodrigoafernandez/protocol/Packet.class
-io/github/rodrigoafernandez/protocol/IdentityBody.class
-io/github/rodrigoafernandez/transfer/DiscoveryChannel.class
-io/github/rodrigoafernandez/transfer/DiscoveryChannel$BroadcastListener.class
-io/github/rodrigoafernandez/protocol/PacketBody.class
-io/github/rodrigoafernandez/transfer/TransferChannel.class
-io/github/rodrigoafernandez/transfer/UdpDiscoveryChannel.class

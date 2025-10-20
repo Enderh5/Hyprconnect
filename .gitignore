@@ -1,36 +1,6 @@
-# flake.lock
 .envrc
 .direnv/
-
-
-# Added by cargo
-
-/target
-
-
-# Added by cargo
-#
-# already existing elements were commented out
-
-#/target
-
-
-# Added by cargo
-#
-# already existing elements were commented out
-
-#/target
-
-
-# Added by cargo
-#
-# already existing elements were commented out
-
-#/target
-
-
-# Added by cargo
-#
-# already existing elements were commented out
-
-#/target
+./hyprconnect/target
+./hyprconnect/.settings/
+./hyprconnect/.classpath
+./hyprconnect/.project
