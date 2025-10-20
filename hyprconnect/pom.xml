@@ -15,9 +15,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20240303</version>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.17.1</version>
     </dependency>
   </dependencies>
   <build>
@@ -31,4 +31,9 @@
       </configuration>
     </plugin>
   </plugins>
-</build></project>
+  </build>
+  <properties>
+    <maven.compiler.source>25</maven.compiler.source>
+    <maven.compiler.target>25</maven.compiler.target>
+  </properties>
+</project>

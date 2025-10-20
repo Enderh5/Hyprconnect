@@ -1,21 +1,29 @@
 package io.github.rodrigoafernandez.protocol;
 
+import java.util.HashMap;
+import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class KdeConnectIdentity implements PacketBody{
-    @JsonProperty(value = "deviceId", required =true )
-    public String deviceId;
+public record IdentityBody(
+    @JsonProperty(value = "deviceId", required = true) String deviceId,
+    @JsonProperty(value = "deviceName", required = true) String deviceName,
+    @JsonProperty(value = "deviceType", required = true) String deviceType,
+    @JsonProperty(value = "incomingCapabilities", required = true) String[] incomingCapabilities,
+    @JsonProperty(value = "outgoingCapabilities", required = true) String[] outgoingCapabilities,
+    @JsonProperty(value = "protocolVersion", required = true) int protocolVersion,
 
-    @JsonProperty("deviceName")
-    public String deviceName;
+    Map<String, Object> extra // campos adicionales
+) implements PacketBody {
 
-    @JsonProperty("deviceType")
-    public String deviceType;
+  public IdentityBody {
+    if (extra == null) {
+      extra = new HashMap<>();
+    }
+  }
 
-    @JsonProperty("protocolVersion")
-    public int protocolVersion;
-
-    @JsonProperty("tcpPort")
-    public int tcpPort;
-
+  @JsonAnySetter
+  public void addExtra(String key, Object value) {
+    extra.put(key, value);
+  }
 }

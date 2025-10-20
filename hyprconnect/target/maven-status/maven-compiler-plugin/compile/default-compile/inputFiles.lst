@@ -1,1 +1,7 @@
 /home/rodrigo/Proyectos/hyprconnect/hyprconnect/src/main/java/io/github/rodrigoafernandez/App.java
+/home/rodrigo/Proyectos/hyprconnect/hyprconnect/src/main/java/io/github/rodrigoafernandez/protocol/IdentityBody.java
+/home/rodrigo/Proyectos/hyprconnect/hyprconnect/src/main/java/io/github/rodrigoafernandez/protocol/Packet.java
+/home/rodrigo/Proyectos/hyprconnect/hyprconnect/src/main/java/io/github/rodrigoafernandez/protocol/PacketBody.java
+/home/rodrigo/Proyectos/hyprconnect/hyprconnect/src/main/java/io/github/rodrigoafernandez/transfer/DiscoveryChannel.java
+/home/rodrigo/Proyectos/hyprconnect/hyprconnect/src/main/java/io/github/rodrigoafernandez/transfer/TransferChannel.java
+/home/rodrigo/Proyectos/hyprconnect/hyprconnect/src/main/java/io/github/rodrigoafernandez/transfer/UdpDiscoveryChannel.java
