@@ -1,6 +1,0 @@
-[workspace]
-members = [
-    "hyprconnect_core",
-    "hyprconnect_cli",
-]
-resolver = "2"
