@@ -1,6 +1,7 @@
 .envrc
 .direnv/
-./hyprconnect/target
-./hyprconnect/.settings/
-./hyprconnect/.classpath
-./hyprconnect/.project
+hyprconnect/target/
+hyprconnect/.settings/
+hyprconnect/.classpath
+hyprconnect/.project
+hyprconnect/bin/
