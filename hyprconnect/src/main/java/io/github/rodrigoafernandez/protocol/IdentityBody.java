@@ -29,7 +29,7 @@ public record IdentityBody(
     extra.put(key, value);
   }
 
-  public IdentityBody generateIdentity() {
+  public static IdentityBody generateIdentity() {
     UUID uuid = UUID.randomUUID();
     String[] incomingCapabilities = new String[] { "ping" };
     String[] outgoingCapabilities = new String[] { "ping" };
