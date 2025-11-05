@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public record Packet(
-    @JsonProperty(value = "id", required = true) Instant id,
+    @JsonProperty(value = "id", required = true) long id,
 
     @JsonProperty(value = "type", required = true) String type,
 
@@ -17,7 +17,9 @@ public record Packet(
 
     @JsonProperty(value = "payloadTransferInfo") Map<String, Object> payloadTransferInfo) {
   public Packet {
-    if (!type.matches("/^kdeconnect(\\.[a-z_]+)+$/")) {
+    if (!type.matches("^kdeconnect(\\.[a-z_]+)+$")) {
+      System.out.println(type);
+      System.out.println(type.matches("/^kdeconnect(\\.[a-z_]+)+$/"));
       throw new RuntimeException("Tipo de Paquete inválido");
     }
 
@@ -29,6 +31,7 @@ public record Packet(
     if (body == null)
       throw new RuntimeException("Se debe aportar un cuerpo al paquete");
 
+    System.out.println(body);
     switch (body) {
       case IdentityBody identity -> {
         type = "kdeconnect.identity";
@@ -49,6 +52,6 @@ public record Packet(
       throw new RuntimeException("Error serializando el body", e);
     }
 
-    this(Instant.now(), type, body, size, payloadTransferInfo);
+    this(Instant.now().toEpochMilli(), type, body, size, payloadTransferInfo);
   }
 }

@@ -1,38 +1,68 @@
 package io.github.rodrigoafernandez.protocol;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class IdentityBody implements PacketBody {
+  @JsonProperty(value = "deviceId", required = true)
+  private String deviceId;
+  @JsonProperty(value = "deviceName", required = true)
+  private String deviceName;
+  @JsonProperty(value = "deviceType", required = true)
+  private String deviceType;
+  @JsonProperty(value = "incomingCapabilities", required = true)
+  private String[] incomingCapabilities;
+  @JsonProperty(value = "outgoingCapabilities", required = true)
+  private String[] outgoingCapabilities;
+  @JsonProperty(value = "protocolVersion", required = true)
+  private int protocolVersion;
 
-public record IdentityBody(
-    @JsonProperty(value = "deviceId", required = true) String deviceId,
-    @JsonProperty(value = "deviceName", required = true) String deviceName,
-    @JsonProperty(value = "deviceType", required = true) String deviceType,
-    @JsonProperty(value = "incomingCapabilities", required = true) String[] incomingCapabilities,
-    @JsonProperty(value = "outgoingCapabilities", required = true) String[] outgoingCapabilities,
-    @JsonProperty(value = "protocolVersion", required = true) int protocolVersion,
+  private Map<String, Object> extra = new HashMap<>();
 
-    Map<String, Object> extra // campos adicionales
-) implements PacketBody {
+  public IdentityBody() {
+  }
 
-  public IdentityBody {
-    if (extra == null) {
-      extra = new HashMap<>();
-    }
+  public IdentityBody(
+      String deviceId,
+      String deviceName,
+      String deviceType,
+      String[] incomingCapabilities,
+      String[] outgoingCapabilities,
+      int protocolVersion) {
+    this.deviceId = deviceId;
+    this.deviceName = deviceName;
+    this.deviceType = deviceType;
+    this.incomingCapabilities = incomingCapabilities;
+    this.outgoingCapabilities = outgoingCapabilities;
+    this.protocolVersion = protocolVersion;
+  }
+
+  // Getters y setters estándar
+
+  @JsonAnyGetter
+  public Map<String, Object> getExtra() {
+    return extra;
   }
 
   @JsonAnySetter
-  public void addExtra(String key, Object value) {
+  public void setExtra(String key, Object value) {
     extra.put(key, value);
   }
 
+  // Método estático para generar una identidad de ejemplo
   public static IdentityBody generateIdentity() {
     UUID uuid = UUID.randomUUID();
     String[] incomingCapabilities = new String[] { "ping" };
     String[] outgoingCapabilities = new String[] { "ping" };
-    return new IdentityBody(uuid.toString(), "pcdrdg", "desktop", incomingCapabilities, outgoingCapabilities, 8, null);
+    IdentityBody body = new IdentityBody("_" + uuid.toString().replace('-', '_') + "_", "pcdrdg", "desktop",
+        incomingCapabilities,
+        outgoingCapabilities, 8);
+    body.setExtra("tcpPort", 1716);
+    return body;
   }
 }
