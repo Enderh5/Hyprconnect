@@ -60,9 +60,8 @@ public class App {
         }
 
       } catch (Exception e) {
-
+        System.err.println("Error creando websocket: " + e.getMessage());
       }
-
     });
 
     serverThread.setDaemon(true);
@@ -84,9 +83,6 @@ public class App {
   }
 
   private static void handleClient(Socket client) {
-    // Manejo robusto: leer la línea JSON completa (protocol line-delimited),
-    // responder y esperar a que el peer cierre para evitar RSTs por datos no
-    // leídos.
     try (Socket s = client;
         BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), StandardCharsets.UTF_8))) {
@@ -101,10 +97,6 @@ public class App {
         return;
       }
       System.out.println("[handler] Recibido JSON completo: " + line);
-
-      // Procesar JSON si hace falta (ejemplo: parsear con Jackson)
-      // ObjectMapper mapper = new ObjectMapper();
-      // JsonNode np = mapper.readTree(line);
 
       // Enviar respuesta terminada en newline (el remote usa readLine() también)
       IdentityBody body = IdentityBody.generateIdentity();
@@ -149,7 +141,12 @@ public class App {
     try {
       channel.broadcast();
     } catch (Exception e) {
-
+      System.err.println("Error emitiendo identidad: " + e.getMessage());
+    }
+    try {
+      channel.close();
+    } catch (Exception e) {
+      System.err.println("Error cerrando el canal UDP: " + e.getMessage());
     }
   }
 }
